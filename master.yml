@@ -1,0 +1,27 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Master stack'
+
+Resources:
+  DemoVPC:
+    Type: AWS::CloudFormation::Stack
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      TemplateURL: https://s3.amazonaws.com/stelligent-sandbox-bucket/vpc.yml
+      TimeoutInMinutes: '60'
+  DemoEC2:
+    Type: AWS::CloudFormation::Stack
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      TemplateURL: https://s3.amazonaws.com/stelligent-sandbox-bucket/EC2.yml
+      TimeoutInMinutes: '60'
+
+  # DemoDatabase:
+  #   Type: AWS::CloudFormation::Stack
+  #   DeletionPolicy: Delete
+  #   UpdateReplacePolicy: Delete
+  #   Properties:
+  #     TemplateURL: https://s3.amazonaws.com/stelligent-sandbox-bucket/database.yml
+  #     TimeoutInMinutes: '60'

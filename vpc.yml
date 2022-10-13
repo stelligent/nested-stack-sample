@@ -1,0 +1,124 @@
+---
+AWSTemplateFormatVersion: "2010-09-09"
+Description: 'Nested Stack for VPC'
+
+
+Parameters:
+  IpCidr:
+    Type: String
+    Default: "10.0.0.0/16"
+
+Resources:
+  AppVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref IpCidr
+      Tags:
+        - Key: user
+          Value: allen.fisher
+
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.43.0/24
+      VpcId: !Ref AppVPC
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: ""
+      Tags:
+        - Key: user
+          Value: allen.fisher
+
+  PrivateSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      CidrBlock: 10.0.44.0/24
+      VpcId: !Ref AppVPC
+      AvailabilityZone:
+        Fn::Select:
+          - 0
+          - Fn::GetAZs: ""
+      Tags:
+        - Key: user
+          Value: "allen.fisher.sso"
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: user
+          Value: allen.fisher
+
+  IgAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      InternetGatewayId: !Ref InternetGateway
+      VpcId: !Ref AppVPC
+
+  AllenRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref AppVPC
+      Tags:
+        - Key: user
+          Value: allen.fisher
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref AppVPC
+      Tags:
+        - Key: user
+          Value: allen.fisherr
+
+  AllenRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref AllenRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  NatRoute:
+    Type: AWS::EC2::Route
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateway
+
+  RouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref AllenRouteTable
+      SubnetId: !Ref PublicSubnet
+
+  NatRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      SubnetId: !Ref PrivateSubnet
+
+  NatEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      Domain: vpc
+
+  NatGateway:
+    Type: AWS::EC2::NatGateway
+    Properties:
+      AllocationId: !GetAtt NatEIP.AllocationId
+      SubnetId: !Ref PublicSubnet
+
+Outputs:
+  VPCId:
+    Value: !Ref AppVPC
+    Export:
+      Name: "VPCId"
+  PublicSubnetId:
+    Value: !Ref PublicSubnet
+    Export:
+      Name: "PublicSubnetId"
+  PrivateSubnetId:
+    Value: !Ref PrivateSubnet
+    Export:
+      Name: "PrivateSubnetId"

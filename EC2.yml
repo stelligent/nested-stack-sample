@@ -1,0 +1,10 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'EC2 Instance for Database Access'
+
+Resources:
+  DatabaseAccessInstance:
+      Type: AWS::EC2::Instance
+      Properties:
+        ImageId: ami-08e2d37b6a0129927
+        SubnetId: !ImportValue PublicSubnetId
