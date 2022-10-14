@@ -13,9 +13,6 @@ Resources:
     Type: AWS::EC2::VPC
     Properties:
       CidrBlock: !Ref IpCidr
-      Tags:
-        - Key: user
-          Value: allen.fisher
 
   PublicSubnet:
     Type: AWS::EC2::Subnet
@@ -26,9 +23,6 @@ Resources:
         Fn::Select:
           - 0
           - Fn::GetAZs: ""
-      Tags:
-        - Key: user
-          Value: allen.fisher
 
   PrivateSubnet:
     Type: AWS::EC2::Subnet
@@ -39,16 +33,9 @@ Resources:
         Fn::Select:
           - 0
           - Fn::GetAZs: ""
-      Tags:
-        - Key: user
-          Value: "allen.fisher.sso"
 
   InternetGateway:
     Type: AWS::EC2::InternetGateway
-    Properties:
-      Tags:
-        - Key: user
-          Value: allen.fisher
 
   IgAttachment:
     Type: AWS::EC2::VPCGatewayAttachment
@@ -56,26 +43,20 @@ Resources:
       InternetGatewayId: !Ref InternetGateway
       VpcId: !Ref AppVPC
 
-  AllenRouteTable:
+  PublicRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref AppVPC
-      Tags:
-        - Key: user
-          Value: allen.fisher
 
   PrivateRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
       VpcId: !Ref AppVPC
-      Tags:
-        - Key: user
-          Value: allen.fisherr
 
-  AllenRoute:
+  PublicRoute:
     Type: AWS::EC2::Route
     Properties:
-      RouteTableId: !Ref AllenRouteTable
+      RouteTableId: !Ref PublicRouteTable
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref InternetGateway
 
@@ -89,7 +70,7 @@ Resources:
   RouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
     Properties:
-      RouteTableId: !Ref AllenRouteTable
+      RouteTableId: !Ref PublicRouteTable
       SubnetId: !Ref PublicSubnet
 
   NatRouteTableAssociation:

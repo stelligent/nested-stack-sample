@@ -2,26 +2,33 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: 'Master stack'
 
+Parameters:
+  VPCTemplateURL:
+    Description: S3 URL to VPC Template
+    Type: String
+
+  EC2TemplateURL:
+    Description: S3 URL to EC2 Template
+    Type: String
+
 Resources:
   DemoVPC:
     Type: AWS::CloudFormation::Stack
     DeletionPolicy: Delete
     UpdateReplacePolicy: Delete
     Properties:
-      TemplateURL: https://s3.amazonaws.com/stelligent-sandbox-bucket/vpc.yml
+      TemplateURL: !Ref VPCTemplateURL
       TimeoutInMinutes: '60'
+
   DemoEC2:
     Type: AWS::CloudFormation::Stack
     DeletionPolicy: Delete
     UpdateReplacePolicy: Delete
     Properties:
-      TemplateURL: https://s3.amazonaws.com/stelligent-sandbox-bucket/EC2.yml
+      TemplateURL: !Ref EC2TemplateURL
       TimeoutInMinutes: '60'
-
-  # DemoDatabase:
-  #   Type: AWS::CloudFormation::Stack
-  #   DeletionPolicy: Delete
-  #   UpdateReplacePolicy: Delete
-  #   Properties:
-  #     TemplateURL: https://s3.amazonaws.com/stelligent-sandbox-bucket/database.yml
-  #     TimeoutInMinutes: '60'
+      Parameters:
+        SubNetID:
+          Fn::GetAtt:
+          - DemoVPC
+          - Outputs.PublicSubnetId

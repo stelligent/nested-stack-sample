@@ -1,10 +1,13 @@
 ---
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'EC2 Instance for Database Access'
+Description: EC2 Instance
+Parameters:
+  SubNetID:
+    Type: String
 
 Resources:
   DatabaseAccessInstance:
       Type: AWS::EC2::Instance
       Properties:
-        ImageId: ami-08e2d37b6a0129927
-        SubnetId: !ImportValue PublicSubnetId
+        ImageId: ami-09208e69ff3feb1db
+        SubnetId: !Ref SubNetID
