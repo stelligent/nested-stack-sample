@@ -61,6 +61,7 @@ if args.destroy:
     wait_for_stack(stack_name, 'stack_delete_complete')
     print(f'Stack {stack_name} deleted successfully')
 else:
+    print("Uploading templates")
     for x in os.listdir():
         if x.endswith('.yml'):
             s3.upload_file(x, bucket_name, x)
